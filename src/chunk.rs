@@ -12,41 +12,42 @@ pub struct Chunk {
 }
 
 impl Chunk {
-    const LENGTH_SIZE: usize = 4;
-    const TYPE_SIZE: usize = 4;
-    const CRC_SIZE: usize = 4;
-    const METADATA_SIZE: usize =
+    pub const LENGTH_SIZE: usize = 4;
+    pub const TYPE_SIZE: usize = 4;
+    pub const CRC_SIZE: usize = 4;
+    pub const METADATA_SIZE: usize =
         Chunk::LENGTH_SIZE + Chunk::TYPE_SIZE + Chunk::CRC_SIZE;
 
-    fn new(chunk_type: ChunkType, data: Vec<u8>) -> Chunk {
+    pub fn new(chunk_type: ChunkType, data: Vec<u8>) -> Chunk {
         Chunk { chunk_type, data }
     }
-    fn length(&self) -> u32 {
+    pub fn length(&self) -> u32 {
         self.data.len() as u32
     }
-    fn chunk_type(&self) -> &ChunkType {
+    pub fn chunk_type(&self) -> &ChunkType {
         &self.chunk_type
     }
-    fn data(&self) -> &[u8] {
+    pub fn data(&self) -> &[u8] {
         &self.data
     }
-    fn crc(&self) -> u32 {
-        let bytes: Vec<u8> = self
-            .chunk_type
-            .bytes()
-            .iter()
-            .cloned()
-            .chain(self.data.iter().cloned())
-            .collect();
+    pub fn crc(&self) -> u32 {
+        let bytes: Vec<u8> = 
+            self
+                .chunk_type
+                .bytes()
+                .iter()
+                .cloned()
+                .chain(self.data.iter().cloned())
+                .collect();
 
         const CRC_PNG: Crc<u32> = Crc::<u32>::new(&CRC_32_ISO_HDLC);
 
         CRC_PNG.checksum(&bytes)
     }
-    fn data_as_string(&self) -> Result<String, crate::Error> {
+    pub fn data_as_string(&self) -> Result<String, crate::Error> {
         Ok(String::from_utf8(self.data.clone())?)
     }
-    fn as_bytes(&self) -> Vec<u8> {
+    pub fn as_bytes(&self) -> Vec<u8> {
         self.chunk_type
             .bytes()
             .iter()
@@ -82,6 +83,7 @@ impl TryFrom<&[u8]> for Chunk {
         }
 
         let new: Self = Self { chunk_type, data };
+
         if new.crc() != crc {
             return Err(Box::new(ChunkError::InvalidCrc));
         }
@@ -121,6 +123,7 @@ impl Display for ChunkError {
     }
 }
 
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -130,8 +133,7 @@ mod tests {
     fn testing_chunk() -> Chunk {
         let data_length: u32 = 42;
         let chunk_type = "RuSt".as_bytes();
-        let message_bytes =
-            "This is where your secret message will be!".as_bytes();
+        let message_bytes = "This is where your secret message will be!".as_bytes();
         let crc: u32 = 2882656334;
 
         let chunk_data: Vec<u8> = data_length
@@ -142,16 +144,14 @@ mod tests {
             .chain(crc.to_be_bytes().iter())
             .copied()
             .collect();
-
+        
         Chunk::try_from(chunk_data.as_ref()).unwrap()
     }
 
     #[test]
     fn test_new_chunk() {
         let chunk_type = ChunkType::from_str("RuSt").unwrap();
-        let data = "This is where your secret message will be!"
-            .as_bytes()
-            .to_vec();
+        let data = "This is where your secret message will be!".as_bytes().to_vec();
         let chunk = Chunk::new(chunk_type, data);
         assert_eq!(chunk.length(), 42);
         assert_eq!(chunk.crc(), 2882656334);
@@ -173,8 +173,7 @@ mod tests {
     fn test_chunk_string() {
         let chunk = testing_chunk();
         let chunk_string = chunk.data_as_string().unwrap();
-        let expected_chunk_string =
-            String::from("This is where your secret message will be!");
+        let expected_chunk_string = String::from("This is where your secret message will be!");
         assert_eq!(chunk_string, expected_chunk_string);
     }
 
@@ -188,8 +187,7 @@ mod tests {
     fn test_valid_chunk_from_bytes() {
         let data_length: u32 = 42;
         let chunk_type = "RuSt".as_bytes();
-        let message_bytes =
-            "This is where your secret message will be!".as_bytes();
+        let message_bytes = "This is where your secret message will be!".as_bytes();
         let crc: u32 = 2882656334;
 
         let chunk_data: Vec<u8> = data_length
@@ -204,8 +202,7 @@ mod tests {
         let chunk = Chunk::try_from(chunk_data.as_ref()).unwrap();
 
         let chunk_string = chunk.data_as_string().unwrap();
-        let expected_chunk_string =
-            String::from("This is where your secret message will be!");
+        let expected_chunk_string = String::from("This is where your secret message will be!");
 
         assert_eq!(chunk.length(), 42);
         assert_eq!(chunk.chunk_type().to_string(), String::from("RuSt"));
@@ -217,8 +214,7 @@ mod tests {
     fn test_invalid_chunk_from_bytes() {
         let data_length: u32 = 42;
         let chunk_type = "RuSt".as_bytes();
-        let message_bytes =
-            "This is where your secret message will be!".as_bytes();
+        let message_bytes = "This is where your secret message will be!".as_bytes();
         let crc: u32 = 2882656333;
 
         let chunk_data: Vec<u8> = data_length
@@ -239,8 +235,7 @@ mod tests {
     pub fn test_chunk_trait_impls() {
         let data_length: u32 = 42;
         let chunk_type = "RuSt".as_bytes();
-        let message_bytes =
-            "This is where your secret message will be!".as_bytes();
+        let message_bytes = "This is where your secret message will be!".as_bytes();
         let crc: u32 = 2882656334;
 
         let chunk_data: Vec<u8> = data_length
@@ -251,9 +246,9 @@ mod tests {
             .chain(crc.to_be_bytes().iter())
             .copied()
             .collect();
-
+        
         let chunk: Chunk = TryFrom::try_from(chunk_data.as_ref()).unwrap();
-
+        
         let _chunk_string = format!("{}", chunk);
     }
 }
