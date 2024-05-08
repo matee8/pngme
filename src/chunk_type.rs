@@ -12,22 +12,22 @@ pub struct ChunkType {
 }
 
 impl ChunkType {
-    fn bytes(&self) -> [u8; 4] {
+    pub fn bytes(&self) -> [u8; 4] {
         self.value
     }
-    fn is_valid(&self) -> bool {
+    pub fn is_valid(&self) -> bool {
         self.is_reserved_bit_valid()
     }
-    fn is_critical(&self) -> bool {
+    pub fn is_critical(&self) -> bool {
         (self.value[0] >> 5) & 1 == 0
     }
-    fn is_public(&self) -> bool {
+    pub fn is_public(&self) -> bool {
         (self.value[1] >> 5) & 1 == 0
     }
-    fn is_reserved_bit_valid(&self) -> bool {
+    pub fn is_reserved_bit_valid(&self) -> bool {
         (self.value[2] >> 5) & 1 == 0
     }
-    fn is_safe_to_copy(&self) -> bool {
+    pub fn is_safe_to_copy(&self) -> bool {
         (self.value[3] >> 5) & 1 == 1
     }
 }
