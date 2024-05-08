@@ -39,7 +39,7 @@ impl TryFrom<[u8; 4]> for ChunkType {
         let valid_chars: bool = value.iter().all(|&b| b.is_ascii_alphabetic());
 
         if !valid_chars {
-            return Err(Box::new(ChunkTypeError::InvalidCharError));
+            return Err(Box::new(ChunkTypeError::InvalidChar));
         }
 
         Ok(ChunkType { value })
@@ -51,7 +51,7 @@ impl FromStr for ChunkType {
 
     fn from_str(value: &str) -> Result<Self, Self::Err> {
         if value.len() != 4 {
-            return Err(Box::new(ChunkTypeError::ByteLengthError));
+            return Err(Box::new(ChunkTypeError::ByteLength));
         }
 
         let valid_chars: bool = value
@@ -59,7 +59,7 @@ impl FromStr for ChunkType {
             .all(|b| (65..=90).contains(&b) || (97..=122).contains(&b));
 
         if !valid_chars {
-            return Err(Box::new(ChunkTypeError::InvalidCharError));
+            return Err(Box::new(ChunkTypeError::InvalidChar));
         }
 
         Ok(ChunkType {
@@ -76,8 +76,8 @@ impl Display for ChunkType {
 
 #[derive(Debug)]
 pub enum ChunkTypeError {
-    ByteLengthError,
-    InvalidCharError,
+    ByteLength,
+    InvalidChar,
 }
 
 impl error::Error for ChunkTypeError {}
@@ -85,10 +85,10 @@ impl error::Error for ChunkTypeError {}
 impl Display for ChunkTypeError {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         match self {
-            ChunkTypeError::ByteLengthError => {
+            ChunkTypeError::ByteLength => {
                 write!(f, "Invalid length of chunk type!")
             }
-            ChunkTypeError::InvalidCharError => {
+            ChunkTypeError::InvalidChar => {
                 write!(f, "Invalid character in chunk type!")
             }
         }
@@ -187,7 +187,8 @@ mod tests {
 
     #[test]
     pub fn test_chunk_type_trait_impls() {
-        let chunk_type_1: ChunkType = TryFrom::try_from([82, 117, 83, 116]).unwrap();
+        let chunk_type_1: ChunkType =
+            TryFrom::try_from([82, 117, 83, 116]).unwrap();
         let chunk_type_2: ChunkType = FromStr::from_str("RuSt").unwrap();
         let _chunk_string = format!("{}", chunk_type_1);
         let _are_chunks_equal = chunk_type_1 == chunk_type_2;
