@@ -36,7 +36,9 @@ impl TryFrom<[u8; 4]> for ChunkType {
     type Error = Error;
 
     fn try_from(value: [u8; 4]) -> Result<Self, Self::Error> {
-        let valid_chars: bool = value.iter().all(|&b| b.is_ascii_alphabetic());
+        let valid_chars: bool = value
+            .iter()
+            .all(|&b| (65..=90).contains(&b) || (97..=122).contains(&b));
 
         if !valid_chars {
             return Err(Box::new(ChunkTypeError::InvalidChar));
