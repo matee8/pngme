@@ -44,7 +44,7 @@ impl Chunk {
         CRC_PNG.checksum(&bytes)
     }
     pub fn data_as_string(&self) -> Result<String, crate::Error> {
-        Ok(String::from_utf8(self.data.clone())?)
+        Ok(String::from_utf8_lossy(&self.data).to_string())
     }
     pub fn as_bytes(&self) -> Vec<u8> {
         self.length()
@@ -95,7 +95,12 @@ impl TryFrom<&[u8]> for Chunk {
 
 impl Display for Chunk {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        write!(f, "{}", self.data_as_string().unwrap())
+        let res: String = format!(
+            "{} {}",
+            String::from_utf8_lossy(&self.chunk_type.bytes()),
+            &self.data_as_string().unwrap()
+        );
+        write!(f, "{}", res)
     }
 }
 

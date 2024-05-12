@@ -5,7 +5,7 @@ use std::{
     fmt::{self, Display, Formatter},
 };
 
-struct Png {
+pub struct Png {
     chunks: Vec<Chunk>,
 }
 
