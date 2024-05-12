@@ -33,10 +33,13 @@ fn encode(args: EncodeArgs) -> Result<()> {
 fn decode(args: DecodeArgs) -> Result<()> {
     let input_bytes: Vec<u8> = fs::read(args.file_path)?;
     let img: Png = Png::try_from(input_bytes.as_slice())?;
-    let chunk: Option<&Chunk> = img.chunk_by_type(&args.chunk_type.to_string());
-    match chunk {
-        Some(c) => println!("{}", c),
-        None => println!("No chunks found"),
+    let chunks: Vec<&Chunk> = img.chunk_by_type(&args.chunk_type.to_string());
+    if chunks.len() == 0 {
+        println!("No chunks found by this type.");
+        return Ok(());
+    }
+    for chunk in chunks {
+        println!("{}", chunk);
     }
     Ok(())
 }

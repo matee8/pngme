@@ -33,10 +33,11 @@ impl Png {
     pub fn chunks(&self) -> &[Chunk] {
         &self.chunks
     }
-    pub fn chunk_by_type(&self, chunk_type: &str) -> Option<&Chunk> {
+    pub fn chunk_by_type(&self, chunk_type: &str) -> Vec<&Chunk> {
         self.chunks
             .iter()
-            .find(|c| c.chunk_type().to_string() == chunk_type)
+            .filter(|c| c.chunk_type().to_string() == chunk_type)
+            .collect()
     }
     pub fn as_bytes(&self) -> Vec<u8> {
         let mut res: Vec<u8> = Png::STANDARD_HEADER.into();

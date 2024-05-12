@@ -101,10 +101,16 @@ impl Display for Chunk {
                 Err(_) => String::from("No hidden message!"),
             };
         let chunk: String = match self.data_as_string() {
-            Ok(val) => val,
+            Ok(val) => {
+                if !val.is_empty() {
+                    val
+                } else {
+                    String::from("No hidden message!")
+                }
+            }
             Err(_) => String::from("No hidden message!"),
         };
-        write!(f, "{}", format_args!("{} {}", chunk_type, chunk))
+        write!(f, "{}", format_args!("{}: {}", chunk_type, chunk))
     }
 }
 
