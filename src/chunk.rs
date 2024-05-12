@@ -43,8 +43,8 @@ impl Chunk {
 
         CRC_PNG.checksum(&bytes)
     }
-    pub fn data_as_string(&self) -> Result<String, crate::Error> {
-        Ok(String::from_utf8_lossy(&self.data).to_string())
+    pub fn data_as_string(&self) -> Result<String, Error> {
+        Ok(String::from_utf8(self.data.to_vec())?)
     }
     pub fn as_bytes(&self) -> Vec<u8> {
         self.length()
@@ -80,7 +80,7 @@ impl TryFrom<&[u8]> for Chunk {
         );
 
         if data.len() != length as usize {
-            return Err(Box::new(ChunkError::ToSmallData));
+            return Err(Box::new(ChunkError::TooSmallData));
         }
 
         let new: Self = Self { chunk_type, data };
@@ -95,19 +95,23 @@ impl TryFrom<&[u8]> for Chunk {
 
 impl Display for Chunk {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        let res: String = format!(
-            "{} {}",
-            String::from_utf8_lossy(&self.chunk_type.bytes()),
-            &self.data_as_string().unwrap()
-        );
-        write!(f, "{}", res)
+        let chunk_type: String =
+            match String::from_utf8(self.chunk_type.bytes().to_vec()) {
+                Ok(val) => val,
+                Err(_) => String::from("No hidden message!"),
+            };
+        let chunk: String = match self.data_as_string() {
+            Ok(val) => val,
+            Err(_) => String::from("No hidden message!"),
+        };
+        write!(f, "{}", format_args!("{} {}", chunk_type, chunk))
     }
 }
 
 #[derive(Debug)]
 pub enum ChunkError {
     TooSmall,
-    ToSmallData,
+    TooSmallData,
     InvalidCrc,
 }
 
@@ -119,7 +123,7 @@ impl Display for ChunkError {
             ChunkError::TooSmall => {
                 write!(f, "Invalid length of chunk!")
             }
-            ChunkError::ToSmallData => {
+            ChunkError::TooSmallData => {
                 write!(f, "Invalid data length!")
             }
             ChunkError::InvalidCrc => {
