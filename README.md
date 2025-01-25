@@ -1,4 +1,4 @@
-# PNG Steganography CLI Tool
+# pngme
 
 A command-line utility for hiding secret messages in PNG files using chunk
 metadata. Supports encoding, decoding, removing messages, and inspecting PNG
