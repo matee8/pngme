@@ -1,50 +1,79 @@
-# pngme
+# PngMe
 
 A command-line utility for hiding secret messages in PNG files using chunk
 metadata. Supports encoding, decoding, removing messages, and inspecting PNG
 chunks.
 
-## Features
+# Overview
 
-- **Encode**: Hide secret messages in PNG files
-- **Decode**: Extract hidden messages from PNG files
-- **Remove**: Delete hidden messages from PNG files
-- **Print**: List all searchable chunks in a PNG file
-- **Validation**: CRC checks and chunk type validation
-- **PNG Compliance**: Maintains valid PNG structure during operations
+PngMe is a Rust-based command-line tool that allows users to securely hide
+messages within PNG image files by leveraging the chunk-based architecture of
+the PNG format. It provides functionalities to encode new messages, decode
+existing ones, remove previously hidden messages, and inspect the chunk
+structure of PNG files. The tool is designed to maintain the integrity and
+validity of the PNG file throughout these operations.
 
-## Installation
+**Key Features**:
 
-### Prerequisites
-- Rust (1.50+)
-- Cargo
+-   **Encode**: Embeds a secret message into a specified ancillary chunk of a
+    PNG file. If the chunk type doesn't exist, it can be created.
+-   **Decode**: Extracts and displays a hidden message from a specified chunk
+    type within a PNG file.
+-   **Remove**: Deletes a message (and optionally the chunk itself if it
+    becomes empty or is no longer needed) from a PNG file.
+-   **Print Chunks**: Lists all discoverable chunks within a PNG file, showing
+    their type, size, and offset.
+-   **Validation**: Performs CRC (Cyclic Redundancy Check) validation on chunks
+    and validates chunk type naming conventions according to the PNG
+    specification.
+-   **PNG Structure Preservation**: Ensures that the critical chunk order and
+    overall PNG file structure remain valid after any modification.
 
-### Build from Source
-```bash
-git clone https://github.com/matee8/pngme.git
-cd pngme
-cargo install --path .
-```
+# Getting Started
+
+## Prerequisites
+
+-   Rust programming language
+-   Cargo
+
+## Installation & Setup
+
+1.  **Clone the repository**
+
+    ```bash
+    git clone https://github.com/matee8/pngme.git
+    cd pngme
+    ```
+
+2.  **Build and Install from Source**
+
+    You can compile and install the `pngme` executable to your Cargo binary
+    path (`~/.cargo/bin/` by default) using:
+
+    ```bash
+    cargo install --path .
+    ```
+
+    Once installed, you should be able to run `pngme` directly from your
+    terminal.
+
+    Alternatively, you can build the project and run the executable from the
+    `target/release/` or `target/debug/` directory:
+
+    ```bash
+    cargo build --release
+    ./target/release/pngme --help
+    ```
 
 ## Usage
 
-### Basic Commands
-```bash
-# Encode a message
-pngme encode input.png TeSt "Secret Message" output.png
+PngMe is operated via subcommands.
 
-# Decode a message
-pngme decode input.png TeSt
+## Command-Line Interface Overview
 
-# Remove a message
-pngme remove input.png TeSt
-
-# Print all chunks
-pngme print input.png
 ```
+pngme 0.1.0
 
-### Options
-```
 USAGE:
     pngme <SUBCOMMAND>
 
@@ -60,30 +89,45 @@ SUBCOMMANDS:
     remove    Remove a secret message from a .png file
 ```
 
-## Project Structure
+## Basic Command Examples
 
-```
-/src
-├── args.rs       # CLI argument parsing
-├── chunk.rs      # PNG chunk implementation
-├── chunk_type.rs # Chunk type validation
-├── commands.rs   # Command implementations
-├── main.rs       # Main entry point
-├── png.rs        # PNG file handling
-```
+1.  **Encode a message**:
 
-Key Components:
-- Chunk validation with CRC-32 checks
-- Proper handling of critical vs ancillary chunks
-- Preservation of PNG structure during operations
-- ASCII validation for chunk types
+    Hide the string "Secret Message" in a chunk of type `TeSt` within
+    `input.png`, saving the result to `output.png`.
+
+    ```bash
+    pngme encode ./path/to/input.png TeSt "Secret Message" ./path/to/output.png
+    ```
+
+2.  **Decode a message**:
+
+    Extract and display the message hidden in the `TeSt` chunk of
+    `image_with_secret.png`.
+
+    ```bash
+    pngme decode ./path/to/image_with_secret.png TeSt
+    ```
+
+3.  **Remove a message**:
+
+    Delete the message (and typically the chunk itself if it's custom) from the
+    `TeSt` chunk in `image_with_secret.png`. The output is usually written back
+    to the input file.
+
+    ```bash
+    pngme remove ./path/to/image_with_secret.png TeSt
+    ```
+
+4.  **Print all chunks**:
+
+    List all chunks found in `my_image.png`, showing their types, sizes, and
+    potentially other metadata.
+
+    ```bash
+    pngme print ./path/to/my_image.png
+    ```
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- PNG file format specification
-- `structopt` for CLI parsing
-- `crc` crate for checksum validation
+This project is licensed under the [MIT License](LICENSE).
